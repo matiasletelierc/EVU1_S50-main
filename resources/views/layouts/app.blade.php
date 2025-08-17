@@ -26,14 +26,8 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/proyectos">Proyectos</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Contacto</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Acerca de</a>
-                    </li>
                     <!-- auth links will be injected here by JS -->
-                    <span id="nav-auth-links"></span>
+                    <template id="nav-auth-links"></template>
                 </ul>
             </div>
         </div>
@@ -57,18 +51,24 @@
     <script>
     document.addEventListener('DOMContentLoaded', function () {
         function updateNavAuth() {
-            const container = document.getElementById('nav-auth-links');
-            if (!container) return;
+            const template = document.getElementById('nav-auth-links');
+            const parent = document.querySelector('.navbar-nav');
+            if (!template || !parent) return;
+
+            // remove any previously injected auth items
+            parent.querySelectorAll('.injected-auth').forEach(el => el.remove());
+
             const token = localStorage.getItem('token');
             if (token) {
-                container.innerHTML = `\
-                    <li class="nav-item dropdown">\
+                const html = `\
+                    <li class="nav-item dropdown injected-auth">\
                         <a class="nav-link dropdown-toggle" href="#" id="userMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">Cuenta</a>\
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">\
                             <li><a class="dropdown-item" href="/proyectos">Mis proyectos</a></li>\
                             <li><a class="dropdown-item" href="#" id="logoutBtn">Cerrar sesión</a></li>\
                         </ul>\
                     </li>`;
+                parent.insertAdjacentHTML('beforeend', html);
 
                 const logout = document.getElementById('logoutBtn');
                 if (logout) {
@@ -80,13 +80,14 @@
                     });
                 }
             } else {
-                container.innerHTML = `\
-                    <li class="nav-item">\
+                const html = `\
+                    <li class="nav-item d-flex align-items-center injected-auth">\
                         <a class="nav-link" href="/login">Iniciar Sesión</a>\
                     </li>\
-                    <li class="nav-item">\
-                        <a class="nav-link btn btn-outline-light btn-sm ms-2" href="/register">Registrarse</a>\
+                    <li class="nav-item d-flex align-items-center injected-auth">\
+                        <a class="btn btn-outline-light btn-sm ms-2" href="/register">Registrarse</a>\
                     </li>`;
+                parent.insertAdjacentHTML('beforeend', html);
             }
         }
 
