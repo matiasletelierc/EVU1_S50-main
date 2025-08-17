@@ -80,9 +80,11 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
         
         const result = await response.json();
         
-        if (response.ok) {
+            if (response.ok) {
             // Guardar token en localStorage
             localStorage.setItem('token', result.token);
+            // Actualizar navbar dinámicamente si la función está disponible
+            try { if (window.updateNavAuth) window.updateNavAuth(); } catch(e) { /* ignore */ }
             // Mostrar mensaje de éxito
             const alertDiv = document.createElement('div');
             alertDiv.className = 'alert alert-success';

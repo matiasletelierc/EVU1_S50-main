@@ -32,12 +32,8 @@
                     <li class="nav-item">
                         <a class="nav-link" href="#">Acerca de</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/login">Iniciar Sesión</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link btn btn-outline-light btn-sm ms-2" href="/register">Registrarse</a>
-                    </li>
+                    <!-- auth links will be injected here by JS -->
+                    <span id="nav-auth-links"></span>
                 </ul>
             </div>
         </div>
@@ -56,6 +52,49 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.min.js" integrity="sha384-7qAoOXltbVP82dhxHAUje59V5r2YsVfBafyUDxEdApLPmcdhBPg1DKg1ERo0BZlK" crossorigin="anonymous"></script>
     <script src="{{ asset('assets/js/uf.js') }}"></script>
+
+    <!-- Navbar auth links dynamic updater -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        function updateNavAuth() {
+            const container = document.getElementById('nav-auth-links');
+            if (!container) return;
+            const token = localStorage.getItem('token');
+            if (token) {
+                container.innerHTML = `\
+                    <li class="nav-item dropdown">\
+                        <a class="nav-link dropdown-toggle" href="#" id="userMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">Cuenta</a>\
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">\
+                            <li><a class="dropdown-item" href="/proyectos">Mis proyectos</a></li>\
+                            <li><a class="dropdown-item" href="#" id="logoutBtn">Cerrar sesión</a></li>\
+                        </ul>\
+                    </li>`;
+
+                const logout = document.getElementById('logoutBtn');
+                if (logout) {
+                    logout.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        localStorage.removeItem('token');
+                        updateNavAuth();
+                        window.location.href = '/';
+                    });
+                }
+            } else {
+                container.innerHTML = `\
+                    <li class="nav-item">\
+                        <a class="nav-link" href="/login">Iniciar Sesión</a>\
+                    </li>\
+                    <li class="nav-item">\
+                        <a class="nav-link btn btn-outline-light btn-sm ms-2" href="/register">Registrarse</a>\
+                    </li>`;
+            }
+        }
+
+        // Expose to allow other scripts to update nav after login
+        window.updateNavAuth = updateNavAuth;
+        updateNavAuth();
+    });
+    </script>
 
 </body>
 
